@@ -78,10 +78,13 @@ def dense_to_sparse(adj):
 
 
 class SSFGNN(nn.Module):
-    def __init__(self, num_classes, GNN_depth=5):
+    def __init__(self, num_classes, GNN_depth=5, pspnet_weights=None):
         super(SSFGNN, self).__init__()
         self.pspnet = PSPNet_vig(n_classes=10)
-        self.pspnet.load_state_dict(torch.load('checkpoints/pspnet-vig.pt'))
+        if pspnet_weights is not None:
+            self.pspnet.load_state_dict(
+                torch.load(pspnet_weights, map_location='cpu')
+            )
         self.layer3, self.layer4 = self.pspnet.layer3, self.pspnet.layer4
 
         self.feat_dim = 128
@@ -133,10 +136,9 @@ class SSFGNN(nn.Module):
         # segmentation branch
         img = x[:, :12, :, :]
         indices = x[:, 12:, :, :]
-        with torch.no_grad():
-            seg_logit, feat = self.pspnet(img)
-            seg_logit = F.interpolate(seg_logit, (8, 8), mode='bilinear', align_corners=True)
-            seg_map = seg_logit.argmax(1)
+        seg_logit, feat = self.pspnet(img)
+        seg_logit = F.interpolate(seg_logit, (8, 8), mode='bilinear', align_corners=True)
+        seg_map = seg_logit.argmax(1)
         adj_c = segmentation_to_adj_matrix(seg_map)
         adj_c = torch.block_diag(*adj_c)
         adj_c_index, _ = dense_to_sparse(adj_c)

@@ -1,0 +1,15 @@
+# SSF-GNN training environment (verified on Ubuntu + RTX 5090, driver 570, CUDA 12.8)
+# Install into the project venv:  pip install -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple/
+#
+# NOTE:
+# - torch 2.9.0 is the cu128 build (Blackwell/sm_120 capable). Newer torch (>=2.11) bundles
+#   CUDA 13 and will NOT load on this driver (570.x supports up to CUDA 12.8).
+# - GDAL is NOT pip-installable on Linux (source-only). It is provided by the conda env
+#   "gdal-env" and bridged into the venv via .venv/lib/python3.12/site-packages/gdal_osgeo.pth
+#   + the run.sh launcher (sets LD_LIBRARY_PATH).
+torch==2.9.0
+torch-geometric==2.8.0.post1
+numpy==2.5.2
+matplotlib==3.11.1
+tqdm==4.70.0
+opencv-python==5.0.0.93

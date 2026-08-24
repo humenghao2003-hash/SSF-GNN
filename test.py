@@ -17,12 +17,12 @@ if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-    test_path = "E:/datasets/anomaly_dataset_new/test"
+    test_path = "data/test"
     test_dataset = DatasetAnomaly(test_path, transform=False, load_in_memory=False, use_indices=True, binary_classify=binary)
     test_dataloader = DataLoader(test_dataset, batch_size, shuffle=False, num_workers=0, pin_memory=False)
 
     model = SSFGNN(num_class)
-    model.load_state_dict(torch.load('checkpoints_new/D5_3.pt'))
+    model.load_state_dict(torch.load('checkpoints_new/best.pt', map_location='cpu'))
     model.to(device)
     model.eval()
 
